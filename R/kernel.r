@@ -62,7 +62,7 @@ wire_to_msg = function(parts) {
 #'<full description>
 #' @param msg <what param does>
 #' @export
-msg_to_wire = function(msg) {
+msg_to_wire = function(msg, socket_name) {
     bodyparts <- list(
         charToRaw(toJSON(msg$header,        auto_unbox = TRUE)),
         charToRaw(toJSON(msg$parent_header, auto_unbox = TRUE)),
@@ -70,7 +70,9 @@ msg_to_wire = function(msg) {
         charToRaw(toJSON(msg$content,       auto_unbox = TRUE)))
     
     signature <- sign_msg(bodyparts)
-    if(msg$header$msg_type == "stream") {
+    if(socket_name == "shell") {
+        firstField <- msg$identities
+    }else if(msg$header$msg_type == "stream") {
         firstField <- list(charToRaw('stream.stdout'))
     }else{
         firstField <- list(charToRaw(msg$header$msg_type))
@@ -114,7 +116,7 @@ send_response = function(msg_type, parent_msg, socket_name, content) {
     msg <- new_reply(msg_type, parent_msg)
     msg$content <- content
     socket <- sockets[[socket_name]]
-    send.multipart(socket, msg_to_wire(msg))
+    send.multipart(socket, msg_to_wire(msg, socket_name))
 },
 #'<brief desc>
 #'
