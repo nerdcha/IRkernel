@@ -72,7 +72,7 @@ msg_to_wire = function(msg) {
     
     signature <- sign_msg(bodyparts)
     c(
-        msg$identities,
+        msg$header$msg_type,
         list(charToRaw('<IDS|MSG>')),
         list(charToRaw(signature)),
         bodyparts)
@@ -118,10 +118,8 @@ send_response = function(msg_type, parent_msg, socket_name, content) {
 #' @param  <what param does>
 #' @export
 handle_shell = function() {
-    print("Receiving shell message")
     parts <- receive.multipart(sockets$shell)
     msg <- wire_to_msg(parts)
-    print(msg)
     switch(
         msg$header$msg_type,
         execute_request     = executor$execute(msg),
@@ -248,10 +246,7 @@ shutdown = function(request) {
 },
 
 initialize = function(connection_file) {
-    print("Initialize")
     connection_info <<- fromJSON(connection_file)
-    print("Connection info")
-    print(connection_info)
     
     url <- paste0(connection_info$transport, '://', connection_info$ip)
     url_with_port <- function(port_name) {
@@ -267,13 +262,11 @@ initialize = function(connection_file) {
         stdin   = init.socket(zmqctx, 'ZMQ_ROUTER'),
         shell   = init.socket(zmqctx, 'ZMQ_ROUTER'))
     
-    print("binding sockets")
     bind.socket(sockets$hb,      url_with_port('hb_port'))
     bind.socket(sockets$iopub,   url_with_port('iopub_port'))
     bind.socket(sockets$control, url_with_port('control_port'))
     bind.socket(sockets$stdin,   url_with_port('stdin_port'))
     bind.socket(sockets$shell,   url_with_port('shell_port'))
-    print("Sockets bound")
     
     executor <<- Executor$new(send_response = .self$send_response)
 },
@@ -306,14 +299,12 @@ run = function() {
 #'@param connection_file The path to the Jupyter connection file, written by the frontend
 #'@export 
 main <- function(connection_file = '') {
-    print("Main()")
     if (connection_file == '') {
         # On Windows, passing the connection file in as a string literal fails,
         # because the \U in C:\Users looks like a unicode escape. So, we have to
         # pass it as a separate command line argument.
         connection_file = commandArgs(TRUE)[[1]]
     }
-    print(connection_file)
     kernel <- Kernel$new(connection_file = connection_file)
     kernel$run()
 }
