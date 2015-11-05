@@ -174,6 +174,7 @@ is_complete = function(request) {
 },
 
 complete = function(request) {
+    print(request)
     # 5.0 protocol:
     code <- request$content$code
     cursor_pos <- request$content$cursor_pos
