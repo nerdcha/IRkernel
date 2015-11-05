@@ -280,7 +280,6 @@ initialize = function(connection_file) {
 
 run = function() {
     while (TRUE) {
-        print("Polling...")
         events <- poll.socket(
             list(sockets$hb, sockets$shell, sockets$control),
             list('read', 'read', 'read'), timeout = -1L)
