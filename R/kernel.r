@@ -63,7 +63,7 @@ wire_to_msg = function(parts) {
 #' @param msg <what param does>
 #' @export
 msg_to_wire = function(msg) {
-    #print(msg)
+    print(msg)
     bodyparts <- list(
         charToRaw(toJSON(msg$header,        auto_unbox = TRUE)),
         charToRaw(toJSON(msg$parent_header, auto_unbox = TRUE)),
@@ -72,7 +72,7 @@ msg_to_wire = function(msg) {
     
     signature <- sign_msg(bodyparts)
     c(
-        msg$header$msg_type,
+        charToRaw(msg$header$msg_type),
         list(charToRaw('<IDS|MSG>')),
         list(charToRaw(signature)),
         bodyparts)
