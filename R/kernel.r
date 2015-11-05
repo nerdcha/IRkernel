@@ -72,7 +72,7 @@ msg_to_wire = function(msg) {
     
     signature <- sign_msg(bodyparts)
     c(
-        charToRaw(msg$header$msg_type),
+        list(charToRaw(msg$header$msg_type)),
         list(charToRaw('<IDS|MSG>')),
         list(charToRaw(signature)),
         bodyparts)
