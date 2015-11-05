@@ -63,7 +63,6 @@ wire_to_msg = function(parts) {
 #' @param msg <what param does>
 #' @export
 msg_to_wire = function(msg) {
-    print(msg)
     bodyparts <- list(
         charToRaw(toJSON(msg$header,        auto_unbox = TRUE)),
         charToRaw(toJSON(msg$parent_header, auto_unbox = TRUE)),
@@ -71,6 +70,11 @@ msg_to_wire = function(msg) {
         charToRaw(toJSON(msg$content,       auto_unbox = TRUE)))
     
     signature <- sign_msg(bodyparts)
+    if(msg$header$msg_type == "stream") {
+        firstField <- list(charToRaw('stream.stdout'))
+    }else{
+        firstField <- list(charToRaw(msg$header$msg_type))
+    }
     c(
         list(charToRaw(msg$header$msg_type)),
         list(charToRaw('<IDS|MSG>')),
