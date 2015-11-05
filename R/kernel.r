@@ -76,7 +76,7 @@ msg_to_wire = function(msg) {
         firstField <- list(charToRaw(msg$header$msg_type))
     }
     c(
-        list(charToRaw(msg$header$msg_type)),
+        list(firstField),
         list(charToRaw('<IDS|MSG>')),
         list(charToRaw(signature)),
         bodyparts)
